@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: rvm
-# Resource:: gem
+# Library: gem_package resource monkey patch
 #
 # Author:: Fletcher Nichol <fnichol@nichol.ca>
 #
@@ -9,9 +9,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,18 +19,16 @@
 # limitations under the License.
 #
 
-actions :install, :upgrade, :remove, :purge
-
-attribute :package_name,  :kind_of => String, :name_attribute => true
-attribute :version,       :kind_of => String
-attribute :ruby_string,   :kind_of => String, :default => "default"
-attribute :response_file, :kind_of => String
-attribute :source,        :kind_of => String
-attribute :options,       :kind_of => Hash
-attribute :gem_binary,    :kind_of => String
-
-def initialize(*args)
-  super
-  @action = :install
-  @provider = Chef::Provider::Package::RVMRubygems
+##
+# Patch Chef::Reousrce::GemPackage resource to use the RVMRubygems provider.
+# This has potentially dangerous side effects and should be considered
+# experimental. You have been warned.
+def patch_gem_package
+  ::Chef::Resource::GemPackage.class_eval do
+    def initialize(name, run_context=nil)
+      super
+      @resource_name = :gem_package
+      @provider = Chef::Provider::Package::RVMRubygems
+    end
+  end
 end

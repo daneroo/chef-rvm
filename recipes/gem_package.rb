@@ -1,8 +1,6 @@
 #
 # Cookbook Name:: rvm
-# Resource:: gem
-#
-# Author:: Fletcher Nichol <fnichol@nichol.ca>
+# Recipe:: gem_package
 #
 # Copyright 2011, Fletcher Nichol
 #
@@ -19,18 +17,7 @@
 # limitations under the License.
 #
 
-actions :install, :upgrade, :remove, :purge
-
-attribute :package_name,  :kind_of => String, :name_attribute => true
-attribute :version,       :kind_of => String
-attribute :ruby_string,   :kind_of => String, :default => "default"
-attribute :response_file, :kind_of => String
-attribute :source,        :kind_of => String
-attribute :options,       :kind_of => Hash
-attribute :gem_binary,    :kind_of => String
-
-def initialize(*args)
-  super
-  @action = :install
-  @provider = Chef::Provider::Package::RVMRubygems
-end
+patch_gem_package
+::Chef::Log.info "gem_package resource has been patched to use provider " <<
+  "Chef::Provider::Package::RVMRubygems and will install gems to " <<
+  "the #{node['rvm']['gem_package']['rvm_string']} RVM Ruby."
